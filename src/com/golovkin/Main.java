@@ -1,7 +1,6 @@
 package com.golovkin;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Random;
 
 public class Main {
@@ -19,7 +18,7 @@ public class Main {
     private static final int NEIGHBOURS_COUNT_IF_NEW_SHOULD_BORN = 3;
     private static final String GAME_OVER_MESSAGE = "GAME OVER";
 
-    private static ProcessBuilder consoleCleanerProcessBuilder;
+    private static ProcessBuilder windowsConsoleCleanerProcessBuilder;
     private static boolean[] adjacentNeighbours = new boolean[8];
     //endregion
 
@@ -43,7 +42,7 @@ public class Main {
 
         if (os.contains("Windows"))
         {
-            consoleCleanerProcessBuilder = new ProcessBuilder("cmd", "/c", "cls").inheritIO();
+            windowsConsoleCleanerProcessBuilder = new ProcessBuilder("cmd", "/c", "cls").inheritIO();
         }
     }
 
@@ -225,8 +224,8 @@ public class Main {
     }
 
     private static void tryClearConsole() throws InterruptedException, IOException {
-        if (consoleCleanerProcessBuilder != null) {
-            consoleCleanerProcessBuilder.start().waitFor();
+        if (windowsConsoleCleanerProcessBuilder != null) {
+            windowsConsoleCleanerProcessBuilder.start().waitFor();
         }
     }
 
