@@ -11,7 +11,7 @@ public class Main {
     private static final int MAP_WIDTH = 20;
     private static final int MAP_HEIGHT = 20;
 
-    private static final int PAUSE_BETWEEN_GENERATIONS_IN_MILLIS = 10;
+    private static final int PAUSE_BETWEEN_GENERATIONS_IN_MILLIS = 100;
 
     private static final int NEIGHBOURS_COUNT_IF_UNDERPOPULATED = 2;
     private static final int NEIGHBOURS_COUNT_IF_OVERPOPULATED = 3;
@@ -28,48 +28,39 @@ public class Main {
             checkOs();
             checkConstants();
             gameLoop();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     //region Checks
-    private static void checkOs()
-    {
+    private static void checkOs() {
         final String os = System.getProperty("os.name");
 
-        if (os.contains("Windows"))
-        {
+        if (os.contains("Windows")) {
             windowsConsoleCleanerProcessBuilder = new ProcessBuilder("cmd", "/c", "cls").inheritIO();
         }
     }
 
     private static void checkConstants() {
-        int[] constants = { MAP_WIDTH, MAP_HEIGHT, PAUSE_BETWEEN_GENERATIONS_IN_MILLIS,
-                NEIGHBOURS_COUNT_IF_UNDERPOPULATED, NEIGHBOURS_COUNT_IF_OVERPOPULATED, NEIGHBOURS_COUNT_IF_NEW_SHOULD_BORN };
+        int[] constants = {MAP_WIDTH, MAP_HEIGHT, PAUSE_BETWEEN_GENERATIONS_IN_MILLIS,
+                NEIGHBOURS_COUNT_IF_UNDERPOPULATED, NEIGHBOURS_COUNT_IF_OVERPOPULATED, NEIGHBOURS_COUNT_IF_NEW_SHOULD_BORN};
 
-        for (int constant : constants)
-        {
-            if (constant < 0)
-            {
+        for (int constant : constants) {
+            if (constant < 0) {
                 throw new IllegalArgumentException("Значение констант должно быть > 0.");
             }
         }
 
-        if (MAP_WIDTH < 9 || MAP_HEIGHT < 9)
-        {
+        if (MAP_WIDTH < 9 || MAP_HEIGHT < 9) {
             throw new IllegalArgumentException("Неверные размеры карты.");
         }
 
-        if (NEIGHBOURS_COUNT_IF_UNDERPOPULATED > NEIGHBOURS_COUNT_IF_OVERPOPULATED)
-        {
+        if (NEIGHBOURS_COUNT_IF_UNDERPOPULATED > NEIGHBOURS_COUNT_IF_OVERPOPULATED) {
             throw new IllegalArgumentException("Число \"одиночества\" не может быть больше числа \"перенаселенности\".");
         }
 
-        if (NEIGHBOURS_COUNT_IF_NEW_SHOULD_BORN < NEIGHBOURS_COUNT_IF_UNDERPOPULATED  || NEIGHBOURS_COUNT_IF_NEW_SHOULD_BORN > NEIGHBOURS_COUNT_IF_OVERPOPULATED)
-        {
+        if (NEIGHBOURS_COUNT_IF_NEW_SHOULD_BORN < NEIGHBOURS_COUNT_IF_UNDERPOPULATED || NEIGHBOURS_COUNT_IF_NEW_SHOULD_BORN > NEIGHBOURS_COUNT_IF_OVERPOPULATED) {
             throw new IllegalArgumentException("Новая жизнь никогда не появится. Измените соответствующую константу.");
         }
     }
@@ -88,8 +79,7 @@ public class Main {
 
             computeNextGeneration(currentGenerationMap, nextGenerationMap);
 
-            if (isGameOver(currentGenerationMap, nextGenerationMap))
-            {
+            if (isGameOver(currentGenerationMap, nextGenerationMap)) {
                 System.out.println(GAME_OVER_MESSAGE);
                 break;
             }
@@ -103,22 +93,17 @@ public class Main {
     }
 
     //region Game logic
-    private static void initializeMap(boolean[][] map)
-    {
+    private static void initializeMap(boolean[][] map) {
         Random random = new Random();
-        for (int i = 1; i < map.length - 1; i++)
-        {
-            for (int j = 1; j < map[0].length - 1; j++)
-            {
+        for (int i = 1; i < map.length - 1; i++) {
+            for (int j = 1; j < map[0].length - 1; j++) {
                 map[i][j] = random.nextBoolean();
             }
         }
     }
 
-    private static void copyMapContent(boolean[][] sourceMap, boolean[][] destinationMap)
-    {
-        for (int i = 0; i < sourceMap.length; i++)
-        {
+    private static void copyMapContent(boolean[][] sourceMap, boolean[][] destinationMap) {
+        for (int i = 0; i < sourceMap.length; i++) {
             System.arraycopy(sourceMap[i], 0, destinationMap[i], 0, sourceMap[0].length);
         }
     }
@@ -135,22 +120,19 @@ public class Main {
         }
     }
 
-    private static boolean isUnderpopulated(int i, int j, boolean[][] map)
-    {
+    private static boolean isUnderpopulated(int i, int j, boolean[][] map) {
         int counter = getAliveAdjacentNeighboursCount(i, j, map);
 
         return map[i][j] && counter < NEIGHBOURS_COUNT_IF_UNDERPOPULATED;
     }
 
-    private static boolean isOverpopulated(int i, int j, boolean[][] map)
-    {
+    private static boolean isOverpopulated(int i, int j, boolean[][] map) {
         int counter = getAliveAdjacentNeighboursCount(i, j, map);
 
         return map[i][j] && counter > NEIGHBOURS_COUNT_IF_OVERPOPULATED;
     }
 
-    private static boolean shouldBorn(int i, int j, boolean[][] map)
-    {
+    private static boolean shouldBorn(int i, int j, boolean[][] map) {
         int counter = getAliveAdjacentNeighboursCount(i, j, map);
 
         return !map[i][j] && counter == NEIGHBOURS_COUNT_IF_NEW_SHOULD_BORN;
@@ -161,8 +143,7 @@ public class Main {
 
         int aliveAdjacentNeighbourCount = 0;
 
-        for (int k = 0; k < adjacentNeighbours.length; k++)
-        {
+        for (int k = 0; k < adjacentNeighbours.length; k++) {
             if (adjacentNeighbours[k]) {
                 aliveAdjacentNeighbourCount++;
             }
@@ -182,19 +163,14 @@ public class Main {
         adjacentNeighbours[7] = map[i + 1][j + 1];
     }
 
-    private static boolean isGameOver(boolean[][] currentGenerationMap, boolean[][] nextGenerationMap)
-    {
+    private static boolean isGameOver(boolean[][] currentGenerationMap, boolean[][] nextGenerationMap) {
         return areThereNoAliveCells(nextGenerationMap) || doesNextConfigurationRepeatCurrent(currentGenerationMap, nextGenerationMap);
     }
 
-    private static boolean doesNextConfigurationRepeatCurrent(boolean[][] currentGenerationMap, boolean[][] nextGenerationMap)
-    {
-        for (int i = 0; i < currentGenerationMap.length; i++)
-        {
-            for (int j = 0; j < currentGenerationMap[0].length; j++)
-            {
-                if (currentGenerationMap[i][j] != nextGenerationMap[i][j])
-                {
+    private static boolean doesNextConfigurationRepeatCurrent(boolean[][] currentGenerationMap, boolean[][] nextGenerationMap) {
+        for (int i = 0; i < currentGenerationMap.length; i++) {
+            for (int j = 0; j < currentGenerationMap[0].length; j++) {
+                if (currentGenerationMap[i][j] != nextGenerationMap[i][j]) {
                     return false;
                 }
             }
@@ -206,8 +182,7 @@ public class Main {
     private static boolean areThereNoAliveCells(boolean[][] map) {
         for (int i = 1; i < map.length - 1; i++) {
             for (int j = 1; j < map[0].length - 1; j++) {
-                if (map[i][j])
-                {
+                if (map[i][j]) {
                     return false;
                 }
             }
@@ -236,8 +211,7 @@ public class Main {
             for (int j = 1; j < array[0].length - 1; j++) {
                 if (array[i][j]) {
                     stringBuilder.append(ALIVE_CELL_CHAR);
-                }
-                else {
+                } else {
                     stringBuilder.append(DEAD_CELL_CHAR);
                 }
             }
